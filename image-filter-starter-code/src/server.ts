@@ -32,44 +32,36 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user
-// @ts-ignore
-app.get("/filteredimage", async (req, res) => {
-  
- 
-    var re = req.query.image_url;
-    
-    if (!re){
-      return res.status(400).send(`Image URL is required`);
-    }
-    const filteredpath = await filterImageFromURL(re);
-    return res.status(200).sendfile(filteredpath);
-    await deleteLocalFiles([filteredpath]);
 
-  //let { image_url } = req.query;
+app.get("/filteredimage", async (req, res) => {
+   let { image_url } = req.query;
   //console.log(image_url)
 
   // Error if url is not given
-  //if (!image_url) {
-    //res.status(400).send("URL not passed as parameter")
-  //}
-  //else {
-   // urlExists(image_url, function(err: any, out: any) {
-     // if(!out){
-      //res.status(400).send("URL not found")
-    //}
-   // });
+  if (!image_url) {
+    res.status(400).send("URL not passed as parameter")
+  }
+  else {
+    urlExists(image_url, function(err: any, out: any) {
+      if(!out){
+      res.status(400).send("URL not found")
+    }
+    });
       
-    //try {
-      //let image_response = await filterImageFromURL( image_url )
-      //if (image_response==="error"){
-       // res.status(415).send('URL is not an Image');
-    //}else{
-    //res.status(200).sendFile(image_response, () =>{deleteLocalFiles([image_response])});
-   // }
-     // res.status(200).sendFile(image_response, async () =>{
-      //  await deleteLocalFiles([image_response])
-     // })
-   
+    try {
+      let image_response = await filterImageFromURL( image_url )
+      if (image_response==="error"){
+        res.status(415).send('URL is not an Image');
+    }else{
+    //sucess if image is present 
+      res.status(200).sendFile(image_response, async () =>{
+      await deleteLocalFiles([image_response])
+      })
+    }
+  }catch{
+    res.status(415).send('URL is not an Image');
+  }
+}
   
 });
 
